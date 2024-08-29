@@ -1,0 +1,158 @@
+# Data configuration
+data_configuration:
+  # Features configuration
+  features_configuration:
+    variables:
+    - t2m
+    data_name: era5
+    spatial_resolution: "025deg"
+    add_auxiliary:
+      time: false
+      lsm-low: false # low resolution = features = ERA5
+      orog-low: false
+      lsm-high: false # high resolution = labels = CERRA
+      orog-high: false
+    spatial_coverage:
+      # Denmark
+      # longitude: [3.5, 18.25]
+      # latitude: [50.50, 61.75]
+      # Spain
+      # longitude: [-8.35, 6.6]
+      # latitude: [35.50, 46.45]
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: true
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    data_location: /net/isilon/ifs/arch/home/jis/ERA5/temp_DK_max/
+    # data_location: /dmidata/users/horron/Data/ERA5/temp_N_S_E_W/
+    # land_mask_location: /dmidata/users/horron/lsm_ERA5.nc
+    # orography_location: /dmidata/users/horron/orography_ERA5.nc
+  # Label configuration
+  label_configuration:
+    variable: t2m
+    data_name: cerra
+    spatial_resolution: "005deg"
+    spatial_coverage:
+      # Denmark
+      # longitude: [5., 17.]
+      # latitude: [52., 60.]
+      # Spain
+      # longitude: [-6.826, 5.126]
+      # latitude: [37.02, 44.99]
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: true
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    data_location: /net/isilon/ifs/arch/home/jis/CERRA/temp_DK_max/
+    # data_location: /dmidata/users/horron/Data/CERRA/temp_N_S_E_W/
+    # land_mask_location: /dmidata/users/horron/lsm_CERRA.nc
+    # orography_location: /dmidata/users/horron/orography_CERRA.nc
+  orog_configuration:
+    variable: orog
+    data_name: cerra
+    spatial_resolution: "005deg"
+    spatial_coverage:
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: false
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise
+    data_location: /dmidata/users/horron/Data/CERRA/orog_N/
+  lsm_configuration:
+    variable: lsm
+    data_name: cerra
+    spatial_resolution: "005deg"
+    spatial_coverage:
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: false
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise
+    data_location: /dmidata/users/horron/Data/CERRA/lsm_N/
+
+  # Common data configuration
+  split_coverages:
+    train:
+      start: 1985-03-01
+      end: 2008-12-31
+      frequency: ME
+    validation:
+      start: 2009-01-01
+      end: 2014-12-31
+      frequency: ME
+    test:
+      start: 2015-01-01
+      end: 2020-12-31
+      frequency: ME
+      do: True
+  # split_coverages:
+  #   train:
+  #     start: 1985-01-01
+  #     end: 1985-03-31
+  #     frequency: ME
+  #   validation:
+  #     start: 1985-04-01
+  #     end: 1985-04-30
+  #     frequency: ME
+  #   test:
+  #     start: 1985-05-01
+  #     end: 1985-05-31
+  #     frequency: ME
+  #     do: True
+# Validation configuration
+validation_configuration:
+  batch_size: 8
+  output_directory: runs/run_18/
+  push_to_hub: false
+  visualizations:
+    sample_observation_vs_prediction:
+      num_samples: 12
+      step: 30
+  baseline: bicubic
+# Training configuration
+training_configuration:
+  type: end2end
+  model_configuration:
+    neural_network:
+      class_name: ConvSwin2SR
+      kwargs:
+        embed_dim: 128
+        depths: [4, 4, 4, 4]
+        num_heads: [4, 4, 4, 4]
+        patch_size: 1
+        window_size: 5 # divisor of input dims (1, 2 and 5 for images (20, 30))
+        num_channels: 1
+        img_range: 1
+        resi_connection: "1conv"
+        upsampler: "pixelshuffle"
+        interpolation_method: "bicubic"
+        hidden_dropout_prob: 0.0
+        upscale: 5 # For this method, must be power of 2.
+  training_parameters:
+    num_epochs: 200
+    batch_size: 8
+    gradient_accumulation_steps: 4
+    learning_rate: 0.001
+    lr_warmup_steps: 500
+    mixed_precision: "fp16"
+    #hf_repo_name: predictia/europe_reanalysis_downscaler_convswin2sr
+    hf_repo_name: null
+    output_dir: runs/run_18
+    # static_covariables:
+    #   - lsm-high
+    #   - orog-high # high resolution = CERRA
+    device: cpu
+    push_to_hub: false
+    seed: 2023
+    save_image_epochs: 5
+    save_model_epochs: 5

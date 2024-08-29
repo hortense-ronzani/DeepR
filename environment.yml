@@ -1,0 +1,32 @@
+# environment.yml: Mandatory dependencies only.
+channels:
+- conda-forge
+- nodefaults
+
+dependencies:
+# Libraries to manipulate data
+- dask
+- xarray
+- netcdf4
+# Deep learning and machine learning libraries
+- pytorch
+- tensorboard
+- accelerate
+- diffusers
+- transformers
+- huggingface_hub
+# Visualization libraries
+- cartopy
+- matplotlib
+- seaborn
+# Metrics libraries
+- evaluate
+- scikit-image
+# Libraries for utilities
+- mlflow
+- pydantic
+- pyyaml
+- tqdm
+# Types for mypy
+- types-requests
+- types-pyyaml

@@ -1,0 +1,64 @@
+# Data configuration
+data_configuration:
+  # Features configuration
+  features_configuration:
+    variables:
+    - t2m
+    data_name: era5
+    add_auxiliary:
+      time: false # in reality it will be forced to True for the evaluation
+      lsm-low: false
+      orog-low: false
+      lsm-high: false
+      orog-high: false
+    spatial_resolution: "025deg"
+    spatial_coverage:
+      longitude: [3.5, 18.25]
+      latitude: [50.50, 61.75]
+    standardization:
+      to_do: true
+      cache_folder: runs/run_03/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    data_location: /net/isilon/ifs/arch/home/jis/ERA5/temp_DK/
+    land_mask_location: /dmidata/users/horron/lsm_ERA5.nc
+    orography_location: /dmidata/users/horron/orography_ERA5.nc
+  # Label configuration
+  label_configuration:
+    variable: t2m
+    data_name: cerra
+    spatial_resolution: "005deg"
+    spatial_coverage:
+      longitude: [5., 17.]
+      latitude: [52., 60.]
+    standardization:
+      to_do: true
+      cache_folder: runs/run_03/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    data_location: /net/isilon/ifs/arch/home/jis/CERRA/temp_DK/
+    land_mask_location: /dmidata/users/horron/lsm_CERRA.nc
+    orography_location: /dmidata/users/horron/orography_CERRA.nc
+  # Common data configuration
+  split_coverages:
+    test:
+      start: 2015-01-01
+      end: 2020-12-31
+      frequency: ME
+      do: true
+# Training configuration
+training_configuration:
+  type: end2end
+  model_configuration:
+    neural_network:
+      class_name: ConvSwin2SR
+      trained_model_dir: runs/run_03/
+# Validation configuration
+validation_configuration:
+  batch_size: 8
+  output_directory: runs/run_03
+  push_to_hub: false
+  hf_repo_name: null
+  visualizations:
+    sample_observation_vs_prediction:
+      num_samples: 12
+      step: 30
+  baseline: bicubic

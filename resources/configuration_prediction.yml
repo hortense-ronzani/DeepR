@@ -1,0 +1,98 @@
+# Data configuration
+data_configuration:
+  # Features configuration
+  features_configuration:
+    variables:
+    - t2m
+    data_name: era5
+    add_auxiliary:
+      time: false # in reality it will be forced to True for the evaluation
+      lsm-low: false
+      orog-low: false
+      lsm-high: false
+      orog-high: false
+    spatial_resolution: 025deg
+    spatial_coverage:
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: true
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    data_location: /net/isilon/ifs/arch/home/jis/ERA5/temp_DK_max/
+    # data_location: /dmidata/users/horron/Data/ERA5/temp_N_S_E_W/
+    # land_mask_location: /dmidata/users/horron/lsm_ERA5.nc
+    # orography_location: /dmidata/users/horron/orography_ERA5.nc
+  # Label configuration
+  label_configuration:
+    variable: t2m
+    data_name: cerra
+    spatial_resolution: 005deg
+    apply_standardization: true
+    spatial_coverage:
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    data_location: /net/isilon/ifs/arch/home/jis/CERRA/temp_DK_max/
+    # data_location: /dmidata/users/horron/Data/CERRA/temp_N_S_E_W/
+    # land_mask_location: /dmidata/users/horron/lsm_CERRA.nc
+    # orography_location: /dmidata/users/horron/orography_CERRA.nc
+  orog_configuration:
+    variable: orog
+    data_name: cerra
+    spatial_resolution: 005deg
+    spatial_coverage:
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: false
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise
+    data_location: /dmidata/users/horron/Data/CERRA/orog_N/
+  lsm_configuration:
+    variable: lsm
+    data_name: cerra
+    spatial_resolution: 005deg
+    spatial_coverage:
+      # No limit
+      longitude: [-.inf, .inf]
+      latitude: [-.inf, .inf]
+    standardization:
+      to_do: false
+      cache_folder: runs/run_18/.cache_reanalysis_scales
+      method: domain-wise
+    data_location: /dmidata/users/horron/Data/CERRA/lsm_N/
+
+  # Common data configuration
+  split_coverages:
+    test:
+      # start: 2015-01-01
+      # end: 2020-12-31
+      start: 1986-01-01
+      end: 2014-12-31
+      frequency: ME
+      do: true
+
+# Training configuration
+training_configuration:
+  type: end2end
+  model_configuration:
+    neural_network:
+      class_name: ConvSwin2SR
+      trained_model_dir: runs/run_18
+  # training_parameters:
+    # static_covariables:
+    # - lsm_high
+    # - orog_high
+
+# Validation configuration
+validation_configuration:
+  batch_size: 8
+
+# Inference configuration
+inference_configuration:
+  batch_size: 8
+  output_dir: runs/run_18/inference_N
+  push_to_hub: false
+  visualizations:
+  save_freq: month

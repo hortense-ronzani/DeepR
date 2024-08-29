@@ -1,0 +1,87 @@
+# Data configuration
+data_configuration:
+  # Features configuration
+  features_configuration:
+    variables:
+    - t2m
+    data_name: era5
+    # add_auxiliary: false
+    add_auxiliary:
+      time: false
+      lsm-low: false
+      orog-low: false
+      lsm-high: false
+      orog-high: false
+    spatial_resolution: "025deg"
+    spatial_coverage:
+      longitude: [-8.35, 6.6]
+      latitude: [46.45, 35.50]
+      #latitude: [35.50, 46.45]
+    apply_standardization: true
+    ### AJOUT ###
+    standardization:
+      to_do: false
+      cache_folder: data/standardized/.cache_reanalysis_scales
+      method: domain-wise # pixel-wise, domain-wise, landmask-wise
+    ### FIN AJOUT ###
+    data_location: data/features/t2m/
+    # data_dir: /PATH/TO/features/
+  # Label configuration
+  label_configuration:
+    variable: t2m
+    data_name: cerra
+    spatial_resolution: "005deg"
+    apply_standardization: true
+    spatial_coverage:
+      longitude: [-6.85, 5.1]
+      #latitude: [44.95, 37]
+      latitude: [37, 44.95]
+    # data_dir: /PATH/TO/labels/
+    data_location: data/labels/t2m/
+  # Common data configuration
+  ### AJOUT ###
+  split_coverages:
+    train:
+      start: 1985-01
+      end: 1985-01
+      frequency: MS
+    validation:
+      start: 1985-01
+      end: 1985-01
+      frequency: MS
+  ### FIN AJOUT ###
+  common_configuration:
+    temporal_coverage:
+      # start: 1985-01
+      start: 1985-01
+      # end: 2020-12
+      end: 1985-01
+      frequency: MS
+    data_split:
+      test: 0.2
+      validation: 0.3
+# Training configuration
+training_configuration:
+  type: end2end
+  model_configuration:
+    neural_network:
+      class_name: ConvBaseline
+      kwargs:
+        interpolation_method: bicubic
+        num_channels: 1
+        upblock_kernel_size: [5, 3]
+        upblock_channels: [32, 16]
+        upscale: 5
+  training_parameters:
+    num_epochs: 200
+    gradient_accumulation_steps: 1
+    learning_rate: 0.0001
+    lr_warmup_steps: 500
+    mixed_precision: "fp16"
+    output_dir: "convbaseline-198501"
+    device: cpu
+    # push_to_hub: true
+    push_to_hub: false
+    seed: 2023
+    save_image_epochs: 5
+    save_model_epochs: 10
